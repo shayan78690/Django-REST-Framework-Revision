@@ -11,6 +11,9 @@ from django.http import Http404
 from rest_framework import mixins, generics, viewsets
 from blogs.models import Blog, Comment
 from blogs.serializers import BlogSerializer, CommentSerializer
+from .pagination import CustomPagination
+from employees.filters import EmployeeFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 # This is the manual way
 # def studentsView(request):
 #     # students = {
@@ -173,10 +176,16 @@ def studentDetailView(request, pk):
 class EmployeeViewset(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+    pagination_class = CustomPagination
+    # filterset_fields = ['designation']
+    filterset_class = EmployeeFilter # Custom
 
 class BlogsView(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['^blog_title', 'blog_body'] # ^ start with symbol
+    ordering_fields = ['id', 'blog_title']
     
 class BlogViewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Blog.objects.all()
